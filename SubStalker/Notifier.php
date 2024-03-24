@@ -22,13 +22,14 @@ class Notifier
 
     public function notifyJoin(int $receiver_id, int $sub_id, int $club_id)
     {
-        $this->notify(self::NOTIFICATION_TYPE_JOIN, $receiver_id, $sub_id, $club_id);
+        $this->notifyAdmin(self::NOTIFICATION_TYPE_JOIN, $receiver_id, $sub_id, $club_id);
+        $this->notifySub(self::NOTIFICATION_TYPE_JOIN, $sub_id, $club_id);
     }
     public function notifyLeave(int $receiver_id, int $sub_id, int $club_id)
     {
-        $this->notify(self::NOTIFICATION_TYPE_LEAVE, $receiver_id, $sub_id, $club_id);
+        $this->notifyAdmin(self::NOTIFICATION_TYPE_LEAVE, $receiver_id, $sub_id, $club_id);
     }
-    private function notify(string $type, int $receiver_id, int $sub_id, int $club_id)
+    private function notifyAdmin(string $type, int $receiver_id, int $sub_id, int $club_id)
     {
         $sub = $this->client->getSubscriber($sub_id);
         if (!$sub) {
@@ -45,6 +46,25 @@ class Notifier
         $text = $this->buildText($type, $sub, $club);
 
         $this->client->sendMessage($receiver_id, $text);
+    }
+
+    private function notifySub(string $type, int $sub_id, int $club_id)
+    {
+        $sub = $this->client->getSubscriber($sub_id);
+        if (!$sub) {
+            echo "failed to load user\r\n";
+            return;
+        }
+
+        $club = $this->client->getClub($club_id);
+        if (!$club) {
+            echo "failed to load club\r\n";
+            return;
+        }
+
+        $text = $this->buildTextForSub($type, $sub, $club);
+
+        $this->client->sendMessage($sub_id, $text);
     }
 
     private function buildMention(User $owner)
@@ -73,6 +93,17 @@ class Notifier
                     $action_string = "покинул";
                 }
                 return "{$sub_mention} {$action_string} сообщество {$club_mention}:(";
+            default:
+                return "Событие непонятого типа :P";
+        }
+    }
+    private function buildTextForSub(string $type, Subscriber $sub, Club $club): string
+    {
+        $sub_mention = self::buildMention($sub);
+        $club_mention = self::buildMention($club);
+        switch ($type){
+            case self::NOTIFICATION_TYPE_JOIN:
+                return "{$sub_mention}, добро пожаловать в сообщество {$club_mention}!";
             default:
                 return "Событие непонятого типа :P";
         }
