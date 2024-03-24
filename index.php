@@ -7,7 +7,8 @@ use SubStalker\Config;
 
 main();
 
-function main() {
-  $app = new SubStalker(Config::GROUP_ID, Config::ACCESS_TOKEN);
-  $app->listen();
+function main(): void
+{
+    $app = new SubStalker(Config::GROUP_ID, Config::RECEPIENT_ID, Config::ACCESS_TOKEN);
+    $app->listen();
 }

@@ -775,7 +775,7 @@ class Groups implements ActionInterface
 	 * @return mixed
 	 * @throws VKClientException
 	 * @throws VKApiException
-	 * @throws VKApiClientUpdateNeededException Client update needed
+	 * @throws VKApiClientUpdateNeededException ProjectClient update needed
 	 */
 	public function leave(string $access_token, array $params = [])
 	{
