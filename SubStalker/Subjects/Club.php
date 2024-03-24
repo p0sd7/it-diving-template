@@ -1,7 +1,6 @@
 <?php
 
 namespace SubStalker\Subjects;
-use SubStalker\Config;
 
 
 class Club extends User

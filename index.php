@@ -1,9 +1,9 @@
 <?php
 
+use SubStalker\Config;
 use SubStalker\SubStalker;
 
 require_once 'vendor/autoload.php';
-use SubStalker\Config;
 
 main();
 

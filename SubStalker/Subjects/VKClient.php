@@ -1,7 +1,9 @@
 <?php
 
 namespace SubStalker\Subjects;
+
 use VK\Client\VKApiClient;
+
 class VKClient
 {
     private string $access_token;
@@ -19,7 +21,7 @@ class VKClient
             $response = $this->client->users()->get($this->access_token, [
                 'user_ids' => [$sub_id], 'fields' => ['sex']
             ]);
-        } catch (\Exception $exception){
+        } catch (\Exception $exception) {
             var_dump($exception);
             return null;
         }
@@ -30,14 +32,15 @@ class VKClient
         );
     }
 
-    public function getClub(int $club_id): ?Club {
+    public function getClub(int $club_id): ?Club
+    {
         try {
             $response = $this->client->groups()->getById(
                 $this->access_token, [
-                'group_id'=>$club_id
+                    'group_id' => $club_id
                 ]
             );
-        } catch(\Exception $exception){
+        } catch (\Exception $exception) {
             var_dump($exception);
             return null;
         }
@@ -51,9 +54,9 @@ class VKClient
             $_response = $this->client->messages()->send($this->access_token,
                 ['peer_id' => $recepient_id,
                     'message' => $text,
-                    'random_id'=>rand()]
+                    'random_id' => rand()]
             );
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             var_dump($exception);
         }
     }

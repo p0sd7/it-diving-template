@@ -2,9 +2,8 @@
 
 namespace SubStalker;
 
-use SubStalker\Subjects\Subscriber;
-use SubStalker\Subjects\Owner;
 use SubStalker\Subjects\Club;
+use SubStalker\Subjects\Subscriber;
 use SubStalker\Subjects\User;
 use SubStalker\Subjects\VKClient;
 
@@ -25,10 +24,12 @@ class Notifier
         $this->notifyAdmin(self::NOTIFICATION_TYPE_JOIN, $receiver_id, $sub_id, $club_id);
         $this->notifySub(self::NOTIFICATION_TYPE_JOIN, $sub_id, $club_id);
     }
+
     public function notifyLeave(int $receiver_id, int $sub_id, int $club_id)
     {
         $this->notifyAdmin(self::NOTIFICATION_TYPE_LEAVE, $receiver_id, $sub_id, $club_id);
     }
+
     private function notifyAdmin(string $type, int $receiver_id, int $sub_id, int $club_id)
     {
         $sub = $this->client->getSubscriber($sub_id);
@@ -67,29 +68,29 @@ class Notifier
         $this->client->sendMessage($sub_id, $text);
     }
 
-    private function buildMention(User $owner)
+    private function buildMention(User $user): string
     {
-        $prefix = ($owner instanceof User) ? 'id':'club';
-        return "[{$prefix}{$owner->getId()}|{$owner->getName()}]";
+        $prefix = ($user instanceof User) ? 'id' : 'club';
+        return "[{$prefix}{$user->getId()}|{$user->getName()}]";
     }
 
     private function buildText(string $type, Subscriber $sub, Club $club): string
     {
         $sub_mention = self::buildMention($sub);
         $club_mention = self::buildMention($club);
-        switch ($type){
+        switch ($type) {
             case self::NOTIFICATION_TYPE_JOIN:
-                if($sub->isFemale()){
+                if ($sub->isFemale()) {
                     $action_string = "подписалась";
-                }else{
+                } else {
                     $action_string = "подписался";
                 }
                 return "{$sub_mention} {$action_string} на сообщество {$club_mention}:)";
 
             case self::NOTIFICATION_TYPE_LEAVE:
-                if($sub->isFemale()){
+                if ($sub->isFemale()) {
                     $action_string = "покинула";
-                }else{
+                } else {
                     $action_string = "покинул";
                 }
                 return "{$sub_mention} {$action_string} сообщество {$club_mention}:(";
@@ -97,11 +98,12 @@ class Notifier
                 return "Событие непонятого типа :P";
         }
     }
+
     private function buildTextForSub(string $type, Subscriber $sub, Club $club): string
     {
         $sub_mention = self::buildMention($sub);
         $club_mention = self::buildMention($club);
-        switch ($type){
+        switch ($type) {
             case self::NOTIFICATION_TYPE_JOIN:
                 return "{$sub_mention}, добро пожаловать в сообщество {$club_mention}!";
             default:
