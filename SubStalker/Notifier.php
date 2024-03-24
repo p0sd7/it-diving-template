@@ -82,7 +82,7 @@ class Notifier
             case self::NOTIFICATION_TYPE_JOIN:
                 if ($sub->isFemale()) {
                     $action_string = "подписалась";
-                } else {
+                } elseif ($sub->isMale()) {
                     $action_string = "подписался";
                 }
                 return "{$sub_mention} {$action_string} на сообщество {$club_mention}:)";
@@ -90,7 +90,7 @@ class Notifier
             case self::NOTIFICATION_TYPE_LEAVE:
                 if ($sub->isFemale()) {
                     $action_string = "покинула";
-                } else {
+                } elseif ($sub->isMale()){
                     $action_string = "покинул";
                 }
                 return "{$sub_mention} {$action_string} сообщество {$club_mention}:(";

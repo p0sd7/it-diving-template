@@ -15,11 +15,11 @@ class Subscriber extends User
 
     public function isFemale(): bool
     {
-        return $this->sex === 0;
+        return $this->sex === 1;
     }
 
     public function isMale(): bool
     {
-        return $this->sex === 1;
+        return $this->sex === 2;
     }
 }
