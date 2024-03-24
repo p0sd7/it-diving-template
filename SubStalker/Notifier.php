@@ -44,12 +44,12 @@ class Notifier
             return;
         }
 
-        $sub_privacy = $sub->privacyStatus();
 
         $text = $this->buildText($type, $sub, $club);
-        $text_about_privacy = $this->buildTextAboutPrivacy($type, $sub);
         $this->client->sendMessage($receiver_id, $text);
 
+        $sub_privacy = $sub->privacyStatus();
+        $text_about_privacy = $this->buildTextAboutPrivacy($type, $sub);
         if ($type != self::NOTIFICATION_TYPE_LEAVE) {
             if (!$sub_privacy) {
                 $this->client->sendMessage($receiver_id, $text_about_privacy);
