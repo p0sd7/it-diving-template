@@ -19,18 +19,18 @@ class Notifier
         $this->client = $client;
     }
 
-    public function notifyJoin(int $receiver_id, int $sub_id, int $club_id)
+    public function notifyJoin(int $receiver_id, int $sub_id, int $club_id): void
     {
         $this->notifyAdmin(self::NOTIFICATION_TYPE_JOIN, $receiver_id, $sub_id, $club_id);
         $this->notifySub(self::NOTIFICATION_TYPE_JOIN, $sub_id, $club_id);
     }
 
-    public function notifyLeave(int $receiver_id, int $sub_id, int $club_id)
+    public function notifyLeave(int $receiver_id, int $sub_id, int $club_id): void
     {
         $this->notifyAdmin(self::NOTIFICATION_TYPE_LEAVE, $receiver_id, $sub_id, $club_id);
     }
 
-    private function notifyAdmin(string $type, int $receiver_id, int $sub_id, int $club_id)
+    private function notifyAdmin(string $type, int $receiver_id, int $sub_id, int $club_id): void
     {
         $sub = $this->client->getSubscriber($sub_id);
         if (!$sub) {
@@ -44,12 +44,20 @@ class Notifier
             return;
         }
 
-        $text = $this->buildText($type, $sub, $club);
+        $sub_privacy = $sub->privacyStatus();
 
+        $text = $this->buildText($type, $sub, $club);
+        $text_about_privacy = $this->buildTextAboutPrivacy($type, $sub);
         $this->client->sendMessage($receiver_id, $text);
+
+        if ($type != self::NOTIFICATION_TYPE_LEAVE) {
+            if (!$sub_privacy) {
+                $this->client->sendMessage($receiver_id, $text_about_privacy);
+            }
+        }
     }
 
-    private function notifySub(string $type, int $sub_id, int $club_id)
+    private function notifySub(string $type, int $sub_id, int $club_id): void
     {
         $sub = $this->client->getSubscriber($sub_id);
         if (!$sub) {
@@ -90,7 +98,7 @@ class Notifier
             case self::NOTIFICATION_TYPE_LEAVE:
                 if ($sub->isFemale()) {
                     $action_string = "покинула";
-                } elseif ($sub->isMale()){
+                } elseif ($sub->isMale()) {
                     $action_string = "покинул";
                 }
                 return "{$sub_mention} {$action_string} сообщество {$club_mention}:(";
@@ -105,9 +113,28 @@ class Notifier
         $club_mention = self::buildMention($club);
         switch ($type) {
             case self::NOTIFICATION_TYPE_JOIN:
-                return "{$sub_mention}, добро пожаловать в сообщество {$club_mention}!";
+                try {
+                    return "{$sub_mention}, добро пожаловать в сообщество {$club_mention}!";
+                } catch (\Exception $exception) {
+                    echo $exception;
+                }
             default:
                 return "Событие непонятого типа :P";
+        }
+    }
+
+    private function buildTextAboutPrivacy(string $type, Subscriber $sub): string
+    {
+        $sub_mention = self::buildMention($sub);
+        switch ($type) {
+            case self::NOTIFICATION_TYPE_JOIN:
+                try {
+                    return "Пользователь {$sub_mention} стесняется! Нельзя отправить приветственное сообщение:(";
+                } catch (\Exception $exception) {
+                    echo $exception;
+                }
+            default:
+                return "Приветственное сообщение отправлено пользователю {$sub_mention}!";
         }
     }
 }
