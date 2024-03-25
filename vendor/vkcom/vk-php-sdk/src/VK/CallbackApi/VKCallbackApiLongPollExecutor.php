@@ -109,7 +109,6 @@ class VKCallbackApiLongPollExecutor {
 
             $this->last_ts = $response[static::EVENTS_TS];
         } catch (VKLongPollServerKeyExpiredException $e) {
-            echo 'adsf';
             $this->server = $this->getLongPollServer();
         }
 
